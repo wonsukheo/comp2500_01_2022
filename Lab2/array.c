@@ -24,8 +24,8 @@ int get_last_index_of(const int numbers[], const size_t element_count, const int
         return -1;
     }
 
-    for (i = element_count - 1; i >= 0; --i) {
-        if (numbers[i] == num && numbers[i] != INT_MIN) {
+    for (i = element_count - 1; (int) i >= 0; --i) {
+        if (numbers[i] == num) {
             return i;
         }
     }
@@ -84,7 +84,7 @@ int is_all_positive(const int numbers[], const size_t element_count)
     size_t i;
     
     if (element_count == 0) {
-        return -1;
+        return FALSE;
     }
 
     for (i = 0; i < element_count; ++i) {
