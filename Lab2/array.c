@@ -19,9 +19,13 @@ int get_index_of(const int numbers[], const size_t element_count, const int num)
 int get_last_index_of(const int numbers[], const size_t element_count, const int num) 
 {
     size_t i;
+    
+    if (element_count == 0) {
+        return -1;
+    }
 
     for (i = element_count - 1; i >= 0; --i) {
-        if (numbers[i] == num) {
+        if (numbers[i] == num && numbers[i] != INT_MIN) {
             return i;
         }
     }
@@ -78,13 +82,13 @@ int get_min_index(const int numbers[], const size_t element_count)
 int is_all_positive(const int numbers[], const size_t element_count)
 {
     size_t i;
-    /*if "empty array" == element_count = 0, i shouldnt have build bot problem*/
+    
     if (element_count == 0) {
         return -1;
     }
 
     for (i = 0; i < element_count; ++i) {
-        if (numbers[i] <= 0) {
+        if (numbers[i] <= 0 && numbers[i] != INT_MIN) {
             return FALSE;
         }
     }
