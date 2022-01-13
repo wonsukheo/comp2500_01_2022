@@ -4,9 +4,9 @@ const size_t BOARD_MAX = 20;
 const size_t BOARD_MIN = 10;
 const size_t BOARD_DEFAULT = 15;
 
-int g_board[20][20];                      /* const array = const pointer? */
-size_t g_board_row = BOARD_DEFAULT;       /* can be declared here? */ 
-size_t g_board_col = BOARD_DEFAULT;       /* or just init? */
+int g_board[20][20];                    
+size_t g_board_row = BOARD_DEFAULT;       
+size_t g_board_col = BOARD_DEFAULT;       
 
 size_t g_black_score = 0;
 size_t g_white_score = 0;
@@ -24,9 +24,9 @@ void init_game(void)
     for (i = 0; i < BOARD_MAX; ++i) {
         for (j = 0; j < BOARD_MAX; ++j) {
             if (i < BOARD_DEFAULT && j < BOARD_DEFAULT) {
-                g_board[i][j] = 1;         /* 1 = valid board */
+                g_board[i][j] = 1;         
             } else {                       
-                g_board[i][j] = 0;         /* 0 = invalid board */ 
+                g_board[i][j] = 0;        
             }
         }
     }
@@ -45,12 +45,12 @@ size_t get_column_count(void)
 int get_score(const color_t color)
 {
     switch (color) {
-        case 'B': 
-            return g_black_score;
-        case 'W':
-            return g_white_score;
-        default:
-            return -1;
+    case 'B': 
+        return g_black_score;
+    case 'W':
+        return g_white_score;
+    default:
+        return -1;
     }
 }
 
@@ -82,20 +82,20 @@ int place_stone(const color_t color, const size_t row, const size_t col)
 {
     if (is_placeable(row, col)) {
         switch (color) {
-            case 'B': 
-                g_board[row][col] = 'B';
+        case 'B': 
+            g_board[row][col] = 'B';
 
-                update_score(color, row, col);
+            update_score(color, row, col);
 
-                return TRUE;
-            case 'W':
-                g_board[row][col] = 'W';
+            return TRUE;
+        case 'W':
+            g_board[row][col] = 'W';
   
-                update_score(color, row, col);
+            update_score(color, row, col);
 
-                return TRUE;
-            default:
-                return FALSE;
+            return TRUE;
+        default:
+            return FALSE;
         }
     }
         
@@ -110,17 +110,17 @@ int insert_row(const color_t color, const size_t row)
     size_t j;
 
     switch (color) {
-        case 'B': 
-            score = &g_black_score;
-            break;
-        case 'W':
-            score = &g_white_score;
-            break;
-        default:
-            return FALSE;
+    case 'B': 
+        score = &g_black_score;
+        break;
+    case 'W':
+        score = &g_white_score;
+        break;
+    default:
+        return FALSE;
     }
     
-    if (g_board_row == BOARD_MAX || row > g_board_row || *score < 3) {      /* enum elements can have same value */ 
+    if (g_board_row == BOARD_MAX || row > g_board_row || *score < 3) {      
         return FALSE;
     }
    
@@ -146,14 +146,14 @@ int insert_column(const color_t color, const size_t col)
     size_t j;
 
     switch (color) {
-        case 'B': 
-            score = &g_black_score;
-            break;
-        case 'W':
-            score = &g_white_score;
-            break;
-        default:
-            return FALSE;
+    case 'B': 
+        score = &g_black_score;
+        break;
+    case 'W':
+        score = &g_white_score;
+        break;
+    default:
+        return FALSE;
     }
     
     if (g_board_col == BOARD_MAX || col > g_board_col || *score < 3) {
@@ -182,17 +182,17 @@ int remove_row(const color_t color, const size_t row)
     size_t j;
 
     switch (color) {
-        case 'B': 
-            score = &g_black_score;
-            break;
-        case 'W':
-            score = &g_white_score;
-            break;
-        default:
-            return FALSE;
+    case 'B': 
+        score = &g_black_score;
+        break;
+    case 'W':
+        score = &g_white_score;
+        break;
+    default:
+        return FALSE;
     }
     
-    if (g_board_row == BOARD_MIN || *score < 3) {
+    if (g_board_row == BOARD_MIN || row >= g_board_row || *score < 3) {
         return FALSE;
     }
 
@@ -218,17 +218,17 @@ int remove_column(const color_t color, const size_t col)
     size_t j;
 
     switch (color) {
-        case 'B': 
-            score = &g_black_score;
-            break;
-        case 'W':
-            score = &g_white_score;
-            break;
-        default:
-            return FALSE;
+    case 'B': 
+        score = &g_black_score;
+        break;
+    case 'W':
+        score = &g_white_score;
+        break;
+    default:
+        return FALSE;
     }
     
-    if (g_board_col == BOARD_MIN || *score < 3) {
+    if (g_board_col == BOARD_MIN || col >= g_board_col || *score < 3) {
         return FALSE;
     }
 
@@ -254,14 +254,14 @@ int swap_rows(const color_t color, const size_t row0, const size_t row1)
     size_t i;
 
     switch (color) {
-        case 'B': 
-            score = &g_black_score;
-            break;
-        case 'W':
-            score = &g_white_score;
-            break;
-        default:
-            return FALSE;
+    case 'B': 
+        score = &g_black_score;
+        break;
+    case 'W':
+        score = &g_white_score;
+        break;
+    default:
+        return FALSE;
     }
     
     if (row0 >= g_board_row || row1 >= g_board_row || *score < 2) {
@@ -285,14 +285,14 @@ int swap_columns(const color_t color, const size_t col0, const size_t col1)
     size_t i;
 
     switch (color) {
-        case 'B': 
-            score = &g_black_score;
-            break;
-        case 'W':
-            score = &g_white_score;
-            break;
-        default:
-            return FALSE;
+    case 'B': 
+        score = &g_black_score;
+        break;
+    case 'W':
+        score = &g_white_score;
+        break;    
+    default:
+        return FALSE;
     }
     
     if (col0 >= g_board_col || col1 >= g_board_col || *score < 2) {
@@ -315,14 +315,14 @@ int copy_row(const color_t color, const size_t src, const size_t dst)
     size_t i;
 
     switch (color) {
-        case 'B': 
-            score = &g_black_score;
-            break;
-        case 'W':
-            score = &g_white_score;
-            break;
-        default:
-            return FALSE;
+    case 'B': 
+        score = &g_black_score;
+        break;
+    case 'W':
+        score = &g_white_score;
+        break;
+    default:
+        return FALSE;
     }
     
     if (src >= g_board_row || dst >= g_board_row || *score < 4) {
@@ -343,14 +343,14 @@ int copy_column(const color_t color, const size_t src, const size_t dst)
     size_t i;
 
     switch (color) {
-        case 'B': 
-            score = &g_black_score;
-            break;
-        case 'W':
-            score = &g_white_score;
-            break;
-        default:
-            return FALSE;
+    case 'B': 
+        score = &g_black_score;
+        break;
+    case 'W':
+        score = &g_white_score;
+        break;
+    default:
+        return FALSE;
     }
     
     if (src >= g_board_col || dst >= g_board_col || *score < 4) {
@@ -367,10 +367,11 @@ int copy_column(const color_t color, const size_t src, const size_t dst)
 
 /* update score */
 
-void update_score(const color_t color, const size_t row, const size_t col) {
+void update_score(const color_t color, const size_t row, const size_t col)
+{
     size_t* score;
     size_t i;
-    int count = 1;  /* declare possible? */
+    int count = 1;  
 
     score = (color == 'B') ? &g_black_score : &g_white_score;
 
@@ -421,7 +422,7 @@ void update_score(const color_t color, const size_t row, const size_t col) {
     count = 1;    
     
     /* check diagonal */
-    for (i = 1; row + i < g_board_row && (col + i < g_board_col); ++i) {     /* if no (), still work? */
+    for (i = 1; row + i < g_board_row && col + i < g_board_col; ++i) {     
         if (g_board[row + i][col + i] == color) {
             count++;
         } else {
@@ -429,7 +430,7 @@ void update_score(const color_t color, const size_t row, const size_t col) {
         }    
     }
    
-    for (i = 1; (int)row - i >= 0 && ((int)col - i >= 0); ++i) {     
+    for (i = 1; (int)row - i >= 0 && (int)col - i >= 0; ++i) {     
         if (g_board[row - i][col - i] == color) {
             count++;
         } else {
@@ -443,7 +444,7 @@ void update_score(const color_t color, const size_t row, const size_t col) {
  
     count = 1;
 
-    for (i = 1; (int)row - i >= 0 && (col + i < g_board_col); ++i) {     
+    for (i = 1; (int)row - i >= 0 && col + i < g_board_col; ++i) {     
         if (g_board[row - i][col + i] == color) {
             count++;
         } else {
@@ -451,7 +452,7 @@ void update_score(const color_t color, const size_t row, const size_t col) {
         }    
     }
    
-    for (i = 1; (row + i < g_board_row) && ((int)col - i >= 0); ++i) {     
+    for (i = 1; (row + i < g_board_row) && (int)col - i >= 0; ++i) {     
         if (g_board[row + i][col - i] == color) {
             count++;
         } else {
