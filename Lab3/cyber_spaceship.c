@@ -24,7 +24,7 @@ const char* get_longest_safe_zone_or_null(const char* const cab_start_location, 
     if (cluster_count == 0) {
         *out_longest_safe_area_length = cab_length;
    
-        return cab_start_location;
+        return travel_ptr;
     }
 
     while (travel_ptr < cab_start_location + cab_length) {
