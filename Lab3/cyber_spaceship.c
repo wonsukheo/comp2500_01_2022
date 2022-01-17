@@ -9,7 +9,6 @@ const char* get_longest_safe_zone_or_null(const char* const cab_start_location, 
     const char* travel_ptr = cab_start_location;
     const char* longest_safe_zone_start_ptr = NULL;
 
-    size_t bSafe = FALSE;
     size_t safe_area_length = 0;
     size_t longest_safe_area_length = 0;
     size_t overlapped_cluster_cnt = 0;
@@ -22,38 +21,38 @@ const char* get_longest_safe_zone_or_null(const char* const cab_start_location, 
     } 
   
     if (cluster_count == 0) {
-        *out_longest_safe_area_length = cab_length;
+        *out_longest_safe_area_length = cab_length - 1;
    
         return travel_ptr;
     }
 
-    while (travel_ptr < cab_start_location + cab_length) {
+    while (travel_ptr <= cab_start_location + cab_length - 1) {
         size_t i;
         
         for (i = 0; i < cluster_count; ++i) {
             if (travel_ptr == cluster_start_locations[i]) {
                 overlapped_cluster_cnt++;
-            } else if (travel_ptr == cluster_start_locations[i] + cluster_lengths[i] - 1) {
+            } else if (travel_ptr == cluster_start_locations[i] + cluster_lengths[i]) {
                 overlapped_cluster_cnt--;
             }
         }
 
-        if (overlapped_cluster_cnt % 2 == 0) {     
-            if (bSafe) { 
-                safe_area_length++;     
+        if (overlapped_cluster_cnt % 2 == 0) {
+            safe_area_length++;
+          
+            if (travel_ptr == cab_start_location + cab_length - 1) {
+                if (safe_area_length >= longest_safe_area_length) {
+                    longest_safe_area_length = safe_area_length;
+                    longest_safe_zone_start_ptr = travel_ptr - longest_safe_area_length + 1;
+                }
             }
-
-            bSafe = TRUE;       
-        } else if (bSafe) {          
-
+        } else {
             if (safe_area_length >= longest_safe_area_length) {
                 longest_safe_area_length = safe_area_length;
                 longest_safe_zone_start_ptr = travel_ptr - longest_safe_area_length;
             }
 
-            bSafe = FALSE;
-
-            safe_area_length = 0;     
+            safe_area_length = 0;    
         }
 
         ++travel_ptr;
@@ -77,7 +76,7 @@ int get_travel_time(const char* const cab_start_location, const size_t cab_lengt
     /* cab_length > 0 expected */
   
     if (cluster_count == 0) {
-        return (int)(cab_length * SAFE_AREA_TRAVEL_SPEED + 0.5);
+        return (int)((cab_length - 1) * SAFE_AREA_TRAVEL_SPEED + 0.5);
     }
 
     while (travel_ptr < cab_start_location + cab_length) {
