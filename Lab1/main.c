@@ -1,21 +1,12 @@
 #include <stdio.h>
 
-enum day {
-    DAY_M,
-    DAY_T = 10
-};
+#include "add.h"
 
 int main(void)
 {
-    int x = 3;
+    int singed_int = -1024;
+    unsigned int unsigned_int1 = 394;
+    unsigned int unsigned_int2 = 2,147,483,647;
 
-    switch (x) {
-    case 0:
-    case 1:
-        ;
-    }
- 
     return 0;
 }
-
-
