@@ -119,14 +119,11 @@ char* tokenize(char* str_or_null, const char* delims)
     while (*s_str != '\0') {
         while (*delims_ptr != '\0') {
             if (*s_str == *delims_ptr++) {
-                if (s_str == str_ptr) {
-                    continue;
-                }
-
                 *s_str = '\0';
 
                 ++s_str;
-                return str_ptr;
+
+                return (*str_ptr == '\0') ? tokenize(NULL, delims) : str_ptr;
             }           
         }
 
