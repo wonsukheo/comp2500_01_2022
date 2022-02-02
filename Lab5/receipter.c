@@ -3,10 +3,7 @@
 
 #include "receipter.h"
 
-#define _CRT_SECURE_NO_WARNINGS
-
 static char s_restaurant_name[] = "Charles' Seafood";
-
 static char s_header[51] = "--------------------------------------------------";
 static char s_footer[51] = "==================================================";
 
@@ -70,7 +67,7 @@ char* print_total(char* receipt)
 
     p += sprintf(p, "%33s%17.2f\n", "Tax", tax);
 
-    total = (int)((s_subtotal * 1.05 + s_tip) * 100)/ 100.f;
+    total = (int)((s_subtotal * 1.05 + s_tip) * 100) / 100.f;
 
     p += sprintf(p, "%33s%17.2f\n", "Total", total);
 
