@@ -115,45 +115,45 @@ int replace_escape_char(char* set)
         if (*p == '\\') {
             while (*char_p != '\0') {         
                 if (*(p + 1) == *char_p) {    
-	            char char;            
+	            char ch;            
                       
                     switch (*char_p) {
                     case '\\':
-                        char = '\\';
+                        ch = '\\';
                         break;
                     case 'a':
-                        char = '\a';
+                        ch = '\a';
                         break;                        
                     case 'b':
-                        char = '\b';
+                        ch = '\b';
                         break;
                     case 'f':
-                        char = '\f';
+                        ch = '\f';
                         break;
                     case 'n':
-                        char = '\n';
+                        ch = '\n';
                         break;
                     case 'r':
-                        char = '\r';
+                        ch = '\r';
                         break;
                     case 't':
-                        char = '\t';
+                        ch = '\t';
                         break;
                     case 'v':
-                        char = '\v';
+                        ch = '\v';
                         break;
                     case '\'':
-                        char = '\'';
+                        ch = '\'';
                         break;
                     case '\"':
-                        char = '\"';
+                        ch = '\"';
                         break;
                     default:
-                        char = *p;
+                        ch = *p;
                         break;
                     }
                     
-                    *p = char;
+                    *p = ch;
                     my_strcat(p + 1, p + 2);
                     goto next_iteration;
                 }
