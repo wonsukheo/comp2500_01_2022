@@ -9,26 +9,27 @@ int translate(int argc, const char** argv)
     const char* set1;
     const char* set1_p;
     const char* set2;
-    size_t set1_len;
-    size_t set2_len;
+    int range_set_return;
+    char c;
+
 
     char set1_cpy[512];
     char set2_cpy[512];
     
-    int flag_i = FALSE;
-    int range_set_return;
+    size_t set1_len;
+    size_t set2_len;
 
-    char c;
+    int flag_i;
 
     if (argc != 3 && argc != 4) {
         return ERROR_CODE_WRONG_ARGUMENTS_NUMBER;
-    }
-    
-    if (argc == 4 && my_strcmp(argv[1], "-i") != 0) {
-        return ERROR_CODE_INVALID_FLAG;
-    }
- 
+    }    
+
     if (argc == 4) { 
+        if (my_strcmp(argv[1], "-i") != 0) {
+            return ERROR_CODE_INVALID_FLAG;
+        }
+
         set1 = argv[2];
         set2 = argv[3];
 
@@ -36,6 +37,8 @@ int translate(int argc, const char** argv)
     } else {
         set1 = argv[1];
         set2 = argv[2];
+    
+        flag_i = FALSE;
     }
 
     set1_len = my_strlen(set1);
@@ -45,10 +48,10 @@ int translate(int argc, const char** argv)
         return ERROR_CODE_ARGUMENT_TOO_LONG;
     }    
 
-    my_strcpy(set1_cpy, set1);
-    my_strcpy(set2_cpy, set2);
+    my_strncpy(set1_cpy, set1, BUFFER_LEN - 1);
+    my_strncpy(set2_cpy, set2, BUFFER_LEN - 1);
 
-    if (replace_escape_char(set1_cpy) == -1 || replace_escape_char(set2_cpy) == -1) {
+    if (replace_escape_char(set1_cpy) == 3 || replace_escape_char(set2_cpy) == 3) {
         return ERROR_CODE_INVALID_FORMAT;
     }
 
@@ -75,7 +78,7 @@ int translate(int argc, const char** argv)
         c |= 0x20;
     }
   
-    while (c != -1) {
+    while (c != EOF) {
         while (set1_p >= set1_cpy) {
             if (c == *set1_p || (flag_i && (c & ~0x20) == *set1_p)) {
                 if (set1_p - set1_cpy >= (int)set2_len) {
@@ -104,7 +107,7 @@ int translate(int argc, const char** argv)
 
 int replace_escape_char(char* set)
 {
-    char escape_char[] = {'\\', 'a', 'b', 'f', 'n', 'r', 't', 'v', '\'', '\"', '\0'};
+    char escape_char[] = { '\\', 'a', 'b', 'f', 'n', 'r', 't', 'v', '\'', '\"', '\0' };
     char* p = set;
     char* char_p = escape_char;
 
@@ -112,45 +115,45 @@ int replace_escape_char(char* set)
         if (*p == '\\') {
             while (*char_p != '\0') {         
                 if (*(p + 1) == *char_p) {    
-	            char c;            
+	            char char;            
                       
                     switch (*char_p) {
                     case '\\':
-                        c = '\\';
+                        char = '\\';
                         break;
                     case 'a':
-                        c = '\a';
+                        char = '\a';
                         break;                        
                     case 'b':
-                        c = '\b';
+                        char = '\b';
                         break;
                     case 'f':
-                        c = '\f';
+                        char = '\f';
                         break;
                     case 'n':
-                        c = '\n';
+                        char = '\n';
                         break;
                     case 'r':
-                        c = '\r';
+                        char = '\r';
                         break;
                     case 't':
-                        c = '\t';
+                        char = '\t';
                         break;
                     case 'v':
-                        c = '\v';
+                        char = '\v';
                         break;
                     case '\'':
-                        c = '\'';
+                        char = '\'';
                         break;
                     case '\"':
-                        c = '\"';
+                        char = '\"';
                         break;
                     default:
-                        c = *p;
+                        char = *p;
                         break;
                     }
                     
-                    *p = c;
+                    *p = char;
                     my_strcat(p + 1, p + 2);
                     goto next_iteration;
                 }
@@ -158,11 +161,10 @@ int replace_escape_char(char* set)
                 ++char_p;
             }
 
-            /* ERROR_CODE_INVALID_FORMAT */
-            return -1; 
+            return ERROR_CODE_INVALID_FORMAT; 
         }
 
-        next_iteration:
+    next_iteration:
         ++p;   
     }
     
@@ -172,14 +174,14 @@ int replace_escape_char(char* set)
 int replace_range_set(char* set)
 {
     char* p = set;
-    int set_len = (int)my_strlen(set);
     int duplicate = FALSE;
 
     while (*p != '\0') {
         if (*p == '-') {     
             int diff;
             int i;
-       
+            size_t set_len = my_strlen(set);
+
             if (p == set || *(p + 1) == '\0') {
                 ++p;
                 continue;
@@ -199,18 +201,20 @@ int replace_range_set(char* set)
                 my_strcat(p, p + 2);
                 ++p;
                 continue;
+            } 
+  
+            if (*(p + 2) == '-') {
+                duplicate = TRUE;
             }
 
             diff = *(p + 1) - *(p - 1);
             
-            if (set_len + diff - 2 >= 511) {
+            if (set_len + diff - 2 > 511) {
                 return ERROR_CODE_ARGUMENT_TOO_LONG;
             }
             
             if (diff > 1) {
-                set_len = (int)my_strlen(set);
-
-                my_strcat_opp(set + set_len + diff - 2, set + set_len, diff - 2);
+                my_strncat_rev(set + set_len + diff - 2, set + set_len, diff - 2);
                 
                 for (i = 1; i < diff; ++i) {
                     *p = *(p - 1) + 1;
@@ -219,8 +223,6 @@ int replace_range_set(char* set)
             } else {
                 my_strcat(p, p + 1);
             }                            
-       
-            duplicate = TRUE;
         }
       
         ++p;
@@ -229,13 +231,16 @@ int replace_range_set(char* set)
     return 0;
 }
 
-void my_strcpy(char* dest, const char* src)
+void my_strncpy(char* dest, const char* src, size_t count)
 {
-    while (*src != '\0') {
+    while (*src != '\0' || count-- != 0) {
         *dest++ = *src++;
     }
-  
-    *dest = '\0';    
+    
+    if (count == 0 && *src != '\0') {
+    } else {
+        *dest = '\0';
+    }        
 }
 
 void my_strcat(char* str1, const char* str2)
@@ -250,7 +255,7 @@ void my_strcat(char* str1, const char* str2)
     *str1_p = '\0';
 }
 
-void my_strcat_opp(char* str1, const char* str2, size_t count)
+void my_strncat_rev(char* str1, const char* str2, size_t count)
 {
     char* str1_p = str1;
     const char* str2_p = str2;
