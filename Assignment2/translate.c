@@ -12,9 +12,8 @@ int translate(int argc, const char** argv)
     int range_set_return;
     char c;
 
-
-    char set1_cpy[512];
-    char set2_cpy[512];
+    char set1_cpy[BUFFER_LEN];
+    char set2_cpy[BUFFER_LEN];
     
     size_t set1_len;
     size_t set2_len;
@@ -44,7 +43,7 @@ int translate(int argc, const char** argv)
     set1_len = my_strlen(set1);
     set2_len = my_strlen(set2);    
 
-    if (set1_len > 511 || set2_len > 511) {
+    if (set1_len > BUFFER_LEN - 1 || set2_len > BUFFER_LEN - 1) {
         return ERROR_CODE_ARGUMENT_TOO_LONG;
     }    
 
@@ -78,7 +77,7 @@ int translate(int argc, const char** argv)
         c |= 0x20;
     }
   
-    while (c != EOF) {
+    while (c != -1) {
         while (set1_p >= set1_cpy) {
             if (c == *set1_p || (flag_i && (c & ~0x20) == *set1_p)) {
                 if (set1_p - set1_cpy >= (int)set2_len) {
@@ -231,16 +230,14 @@ int replace_range_set(char* set)
     return 0;
 }
 
-void my_strncpy(char* dest, const char* src, size_t count)
+void my_strncpy(char* dest, const char* src, int count)
 {
-    while (*src != '\0' || count-- != 0) {
+    while (*src != '\0' && count != 0) {
         *dest++ = *src++;
+        count--;
     }
     
-    if (count == 0 && *src != '\0') {
-    } else {
-        *dest = '\0';
-    }        
+    *dest = '\0';   
 }
 
 void my_strcat(char* str1, const char* str2)

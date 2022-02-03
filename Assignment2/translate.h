@@ -3,7 +3,6 @@
 
 #define TRUE (1)
 #define FALSE (0)
-#define EOF (-1)
 
 typedef enum error_code {
     ERROR_CODE_WRONG_ARGUMENTS_NUMBER = 1,
@@ -19,7 +18,7 @@ int replace_escape_char(char* set);
 
 int replace_range_set(char* set);
 
-void my_strncpy(char* dest, const char* src, size_t count);
+void my_strncpy(char* dest, const char* src, int count);
 
 void my_strcat(char* str1, const char* str2);
 
