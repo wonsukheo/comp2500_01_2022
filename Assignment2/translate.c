@@ -82,8 +82,10 @@ int translate(int argc, const char** argv)
             if (c == *set1_p || (flag_i && (c & ~0x20) == *set1_p)) {
                 if (set1_p - set1_cpy >= (int)set2_len) {
                     c = set2_cpy[set2_len - 1];
+                    break;
                 } else {
                     c = set2_cpy[set1_p - set1_cpy];
+                    break;
                 }
             }
             
@@ -114,7 +116,7 @@ int replace_escape_char(char* set)
         if (*p == '\\') {
             while (*char_p != '\0') {         
                 if (*(p + 1) == *char_p) {    
-	            char ch;            
+                    char ch;           
                       
                     switch (*char_p) {
                     case '\\':
