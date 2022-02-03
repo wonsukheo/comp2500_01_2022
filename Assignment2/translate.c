@@ -215,13 +215,14 @@ int replace_range_set(char* set)
             }
             
             if (diff > 1) {
-                my_strncat_rev(set + set_len + diff - 2, set + set_len, diff);
+                my_strncat_rev(set + set_len + diff - 2, set + set_len, set_len - (p - set + 1));
                 
                 for (i = 1; i <= diff; ++i) {
                     *p = *(p - 1) + 1;
                     p++;
-                    continue;
                 }     
+
+                continue;
             } else {
                 my_strcat(p, p + 1);
             }                            
