@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "translate.h"
 
 #define BUFFER_LEN (512)
@@ -144,6 +146,7 @@ int replace_escape_char(char* set)
                         c = '\"';
                         break;
                     default:
+                        c = *p;
                         break;
                     }
                     
@@ -175,7 +178,7 @@ int replace_range_set(char* set)
     while (*p != '\0') {
         if (*p == '-') {     
             int diff;
-            size_t i;
+            int i;
        
             if (p == set || *(p + 1) == '\0') {
                 ++p;
