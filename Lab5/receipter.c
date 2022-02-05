@@ -3,9 +3,9 @@
 
 #include "receipter.h"
 
-static char s_restaurant_name[] = "Charles' Seafood";
-static char s_header[51] = "--------------------------------------------------";
-static char s_footer[51] = "==================================================";
+const char RESTAURANT_NAME[] = "Charles' Seafood";
+const char HEADER[51] = "--------------------------------------------------";
+const char FOOTER[51] = "==================================================";
 
 static char s_itemlist[512];
 static char* s_itemlist_p = s_itemlist;
@@ -39,7 +39,7 @@ void set_tip(double tip)
 
 void set_message(const char* message)
 {
-    int msg_len = (int)my_strlen(message);
+    size_t msg_len = my_strlen(message);
     
     s_message_p += sprintf(s_message_p, "%.50s\n", message);
 
@@ -63,7 +63,7 @@ char* print_total(char* receipt)
         p += sprintf(p, "%33s%17.2f\n", "Tip", s_tip);
     }
     
-    tax = (int)(s_subtotal * 5) / 100.0f;
+    tax = (int)(s_subtotal * 5) / 100.f;
 
     p += sprintf(p, "%33s%17.2f\n", "Tax", tax);
 
@@ -83,7 +83,7 @@ char* print_header(char* receipt, time_t timestamp)
     
     sprintf(time, "%d-%02d-%02d %02d:%02d:%02d", local->tm_year + 1900, local->tm_mon + 1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
 
-    p += sprintf(p, "%s\n%s\n%-45s%05d\n%s\n", s_restaurant_name, s_header, time, s_receipt_num, s_header);
+    p += sprintf(p, "%s\n%s\n%-45s%05d\n%s\n", RESTAURANT_NAME, HEADER, time, s_receipt_num, HEADER);
 
     return p;     
 }
@@ -92,7 +92,7 @@ char* print_footer(char* receipt)
 {
     char* p = receipt;
     
-    p += sprintf(p, "%s\n%50s", s_footer, "Tax#-51234");
+    p += sprintf(p, "%s\n%50s", FOOTER, "Tax#-51234");
 
     return p;
 }
@@ -104,7 +104,6 @@ void reset_receipt(void)
     s_tip = 0.f;
     s_itemlist_p = s_itemlist;
     s_message_p = s_message;
-    *s_message = '\0';
 }
 int print_receipt(const char* filename, time_t timestamp)
 {
