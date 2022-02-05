@@ -7,18 +7,17 @@
 int translate(int argc, const char** argv)
 {
     const char* set1;
-    const char* set1_p;
+    const char* set1_end_p;
     const char* set2;
-    int range_set_return;
-    char c;
 
     char set1_cpy[BUFFER_LEN];
     char set2_cpy[BUFFER_LEN];
-    
     size_t set1_len;
-    size_t set2_len;
+    size_t set2_len; 
 
+    int range_set_return;
     int flag_i;
+    char c;
 
     if (argc != 3 && argc != 4) {
         return ERROR_CODE_WRONG_ARGUMENTS_NUMBER;
@@ -41,7 +40,7 @@ int translate(int argc, const char** argv)
     }
 
     set1_len = my_strlen(set1);
-    set2_len = my_strlen(set2);    
+    set2_len = my_strlen(set2); 
 
     if (set1_len > BUFFER_LEN - 1 || set2_len > BUFFER_LEN - 1) {
         return ERROR_CODE_ARGUMENT_TOO_LONG;
@@ -69,7 +68,7 @@ int translate(int argc, const char** argv)
     set1_len = my_strlen(set1_cpy);
     set2_len = my_strlen(set2_cpy);  
  
-    set1_p = set1_cpy + set1_len - 1;
+    set1_end_p = set1_cpy + set1_len - 1;
     
     c = getchar();
     
@@ -78,21 +77,21 @@ int translate(int argc, const char** argv)
     }
   
     while (c != -1) {
-        while (set1_p >= set1_cpy) {
-            if (c == *set1_p || (flag_i && (c & ~0x20) == *set1_p)) {
-                if (set1_p - set1_cpy >= (int)set2_len) {
+        while (set1_end_p >= set1_cpy) {
+            if (c == *set1_end_p || (flag_i && (c & ~0x20) == *set1_end_p)) {
+                if (set1_end_p - set1_cpy >= (int)set2_len) {
                     c = set2_cpy[set2_len - 1];
                     break;
                 } else {
-                    c = set2_cpy[set1_p - set1_cpy];
+                    c = set2_cpy[set1_end_p - set1_cpy];
                     break;
                 }
             }
             
-            --set1_p;
+            --set1_end_p;
         }    
         
-        set1_p = set1_cpy + set1_len - 1;
+        set1_end_p = set1_cpy + set1_len - 1;
    
         putchar(c);
 
@@ -179,7 +178,7 @@ int replace_range_set(char* set)
 
     while (*p != '\0') {
         if (*p == '-') {     
-            int diff;
+            size_t diff;
             size_t i;
             size_t set_len = my_strlen(set);
 
