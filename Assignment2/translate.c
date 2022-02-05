@@ -155,7 +155,7 @@ int replace_escape_char(char* set)
                     }
                     
                     *p = ch;
-                    my_strcat(p + 1, p + 2);
+                    my_strcpy(p + 1, p + 2);
                     goto next_iteration;
                 }
 
@@ -175,12 +175,12 @@ int replace_escape_char(char* set)
 int replace_range_set(char* set)
 {
     char* p = set;
-    int duplicate = FALSE;
+    int is_used = FALSE;
 
     while (*p != '\0') {
         if (*p == '-') {     
             int diff;
-            int i;
+            size_t i;
             size_t set_len = my_strlen(set);
 
             if (p == set || *(p + 1) == '\0') {
@@ -188,8 +188,8 @@ int replace_range_set(char* set)
                 continue;
             }
             
-            if (duplicate) {
-                duplicate = FALSE;
+            if (is_used) {
+                is_used = FALSE;
                 ++p;
                 continue;
             }
@@ -199,23 +199,23 @@ int replace_range_set(char* set)
             }
          
             if (*(p - 1) == *(p + 1)) {
-                my_strcat(p, p + 2);
+                my_strcpy(p, p + 2);
                 ++p;
                 continue;
             } 
   
             if (*(p + 2) == '-') {
-                duplicate = TRUE;
+                is_used = TRUE;
             }
 
             diff = *(p + 1) - *(p - 1);
             
-            if (set_len + diff - 2 > 511) {
+            if (set_len + diff - 2 > BUFFER_LEN - 1) {
                 return ERROR_CODE_ARGUMENT_TOO_LONG;
             }
             
             if (diff > 1) {
-                my_strncat_rev(set + set_len + diff - 2, set + set_len, set_len - (p - set + 1));
+                my_strncpy_rev(set + set_len + diff - 2, set + set_len, set_len - (p - set + 1));
                 
                 for (i = 1; i <= diff; ++i) {
                     *p = *(p - 1) + 1;
@@ -224,7 +224,7 @@ int replace_range_set(char* set)
 
                 continue;
             } else {
-                my_strcat(p, p + 1);
+                my_strcpy(p, p + 1);
             }                            
         }
       
@@ -234,7 +234,16 @@ int replace_range_set(char* set)
     return 0;
 }
 
-void my_strncpy(char* dest, const char* src, int count)
+void my_strcpy(char* dest, const char* src)
+{
+    while (*src != '\0') {
+        *dest++ = *src++;
+    }
+    
+    *dest = '\0';   
+}
+
+void my_strncpy(char* dest, const char* src, size_t count)
 {
     while (*src != '\0' && count != 0) {
         *dest++ = *src++;
@@ -244,28 +253,15 @@ void my_strncpy(char* dest, const char* src, int count)
     *dest = '\0';   
 }
 
-void my_strcat(char* str1, const char* str2)
+void my_strncpy_rev(char* dest, const char* src, size_t count)
 {
-    char* str1_p = str1;
-    const char* str2_p = str2;
-
-    while (*str2_p != '\0') {
-        *str1_p++ = *str2_p++;
-    }
-    
-    *str1_p = '\0';
-}
-
-void my_strncat_rev(char* str1, const char* str2, size_t count)
-{
-    char* str1_p = str1;
-    const char* str2_p = str2;
+    char* dest_p = dest;
+    const char* src_p = src;
 
     while (count--) {
-        *str1_p-- = *str2_p--;
+        *dest_p-- = *src_p--;
     }
 }
-
 
 size_t my_strlen(const char* str)
 {

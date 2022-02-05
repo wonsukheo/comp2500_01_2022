@@ -18,11 +18,11 @@ int replace_escape_char(char* set);
 
 int replace_range_set(char* set);
 
-void my_strncpy(char* dest, const char* src, int count);
+void my_strcpy(char* dest, const char* src);
 
-void my_strcat(char* str1, const char* str2);
+void my_strncpy(char* dest, const char* src, size_t count);
 
-void my_strncat_rev(char* str1, const char* str2, size_t count);
+void my_strncpy_rev(char* str1, const char* str2, size_t count);
 
 size_t my_strlen(const char* str);
 
