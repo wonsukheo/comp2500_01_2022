@@ -104,6 +104,7 @@ void reset_receipt(void)
     s_tip = 0.f;
     s_itemlist_p = s_itemlist;
     s_message_p = s_message;
+    *s_message_p = '\0'; 
 }
 int print_receipt(const char* filename, time_t timestamp)
 {
