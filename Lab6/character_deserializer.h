@@ -35,20 +35,17 @@ typedef struct {
 
 int get_character(const char* filename, character_v3_t* out_character);
 
-void deserialize_version_one(char* char_info, character_v3_t* out_character);
+void deserialize_version_one(char* char_stat, character_v3_t* out_character);
 
-void deserialize_version_two(char* char_info, character_v3_t* out_character);
+void deserialize_version_two(char* char_stat, character_v3_t* out_character);
 
-void deserialize_version_three(char* char_info, character_v3_t* out_character);
-
-int my_strcmp(char* str1, char* str2);
-
-void my_strcpy(char* dest, const char* src);
+void deserialize_version_three(char* char_stat, character_v3_t* out_character);
 
 void my_strncpy(char* dest, const char* src, size_t count);
 
-int my_strtok(char** dest, char* str, char delim);
+size_t my_strtok(char** dest, char* str, char delim);
 
-int my_stat_token(unsigned int* uint_dest, char* name_dest, char* str, char delim);
+size_t my_str_uint_tok(unsigned int* key, char* name, char* str, char delim);
 
 #endif /* CHARACTER_DESERIALIZER_H */
+
