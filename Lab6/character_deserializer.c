@@ -97,14 +97,13 @@ void deserialize_version_one(char* char_stat, character_v3_t* out_character)
             } else {
                 char name[NAME_LEN];
                 sprintf(name, "%s%u", "player_", *value_p);
-                my_strncpy(out_character->name, name, NAME_LEN - 1);
+                my_strncpy(out_character->name, name, NAME_LEN);
             }
             break;
         case 'd':
             if (*(*key_p + 2) == 'x') {
                 out_character->dexterity = *value_p;
-            }
-            else {
+            } else {
                 out_character->armour = *value_p;
             }
             break;
@@ -143,7 +142,7 @@ void deserialize_version_two(char* char_stat, character_v3_t* out_character)
     token_count = my_str_uint_tok(value_p, name, key_arr[1], ',');
     assert(token_count == V_TWO_STAT);
 
-    my_strncpy(out_character->name, name, NAME_LEN - 1);
+    my_strncpy(out_character->name, name, NAME_LEN);
 
     out_character->level = *value_p++;
     out_character->strength = *value_p++;
@@ -177,7 +176,7 @@ void deserialize_version_three(char* char_stat, character_v3_t* out_character)
     token_count = my_str_uint_tok(value_p, name, key_arr[1], '|');
     assert(token_count == V_THREE_STAT);
 
-    my_strncpy(out_character->name, name, NAME_LEN - 1);
+    my_strncpy(out_character->name, name, NAME_LEN);
 
     out_character->level = *value_p++;
     out_character->health = *value_p++;
@@ -190,8 +189,8 @@ void deserialize_version_three(char* char_stat, character_v3_t* out_character)
     out_character->elemental_resistance.fire = *value_p++;
     out_character->elemental_resistance.cold = *value_p++;
     out_character->elemental_resistance.lightning = *value_p++;
-    out_character->leadership = *value_p++;;
-    out_character->minion_count = *value_p++;;
+    out_character->leadership = *value_p++;
+    out_character->minion_count = *value_p++;
 
     minion_count = out_character->minion_count;    
     value_p = value_arr;
@@ -200,7 +199,7 @@ void deserialize_version_three(char* char_stat, character_v3_t* out_character)
         token_count = my_str_uint_tok(value_p, name, key_arr[minion_count + 2], '|');
         assert(token_count == 4);
 
-        my_strncpy(out_character->minions[minion_count - 1].name, name, NAME_LEN - 1);
+        my_strncpy(out_character->minions[minion_count - 1].name, name, NAME_LEN);
 
         out_character->minions[minion_count - 1].health = *value_p++;
         out_character->minions[minion_count - 1].strength = *value_p++;
@@ -268,7 +267,7 @@ size_t my_str_uint_tok(unsigned int* key, char* name, char* str, char delim)
             *p = '\0';
 
             if (name_flag) {
-                my_strncpy(name, start_p, NAME_LEN - 1);
+                my_strncpy(name, start_p, NAME_LEN);
                 name_flag = 0;     
             } else {
                 sscanf(start_p, "%u", key_p++);
