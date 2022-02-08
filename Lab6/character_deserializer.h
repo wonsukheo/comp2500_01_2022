@@ -45,6 +45,8 @@ int my_strcmp(char* str1, char* str2);
 
 void my_strcpy(char* dest, const char* src);
 
+void my_strncpy(char* dest, const char* src, size_t count);
+
 int my_strtok(char** dest, char* str, char delim);
 
 int my_stat_token(unsigned int* uint_dest, char* name_dest, char* str, char delim);
