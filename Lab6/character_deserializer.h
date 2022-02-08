@@ -35,11 +35,13 @@ typedef struct {
 
 int get_character(const char* filename, character_v3_t* out_character);
 
-void version_one_deserialize(char* char_info, character_v3_t* out_character);
+void deserialize_version_one(char* char_info, character_v3_t* out_character);
 
-void version_two_deserialize(char* char_info, character_v3_t* out_character);
+void deserialize_version_two(char* char_info, character_v3_t* out_character);
 
-void version_three_deserialize(char* char_info, character_v3_t* out_character);
+void deserialize_version_three(char* char_info, character_v3_t* out_character);
+
+int my_strcmp(char* str1, char* str2);
 
 void my_strcpy(char* dest, const char* src);
 

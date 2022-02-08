@@ -23,15 +23,15 @@ int get_character(const char* filename, character_v3_t* out_character)
     char_info[read_count] = '\0';
 
     if (char_info[3] == ':') {
-        version_one_deserialize(char_info, out_character);
+        deserialize_version_one(char_info, out_character);
         file_v = 1;
 
     } else if (char_info[4] == ',') {
-        version_two_deserialize(char_info, out_character);
+        deserialize_version_two(char_info, out_character);
         file_v = 2;
 
     } else {
-        version_three_deserialize(char_info, out_character);
+        deserialize_version_three(char_info, out_character);
         file_v = 3;
     }
 
@@ -43,31 +43,25 @@ int get_character(const char* filename, character_v3_t* out_character)
     return file_v;
 }
 
-void version_one_deserialize(char* char_info, character_v3_t* out_character)
+void deserialize_version_one(char* char_info, character_v3_t* out_character)
 {
+    const size_t STAT_COUNT = 8;
+    const size_t count;
     char* p = char_info;
     char* start_p = char_info;
 
-    char name[NAME_LEN];
-    char temp[NAME_LEN];
-    int id_flag = 6;
-    unsigned int stat_uint_token[8];
+    char** stat_token[STAT_COUNT];
+    char** stat_token_p = stat_token;
+    unsigned int stat_uint_token[STAT_COUNT];
     unsigned int* stat_uint_token_p = stat_uint_token;
 
     while (*p != '\0') {
         if (*p == ':') {
             *p = ' ';
-        }
-        else if (*p == ',') {
+        } else if (*p == ',') {
             *p = '\0';
-            --id_flag;
 
-            if (!id_flag) {
-                sscanf(start_p, "%s%u", name, stat_uint_token_p++);                
-            }
-            else {
-                sscanf(start_p, "%s%u", temp, stat_uint_token_p++);              
-            }
+            sscanf(start_p, "%s%u", stat_token_p, stat_uint_token_p++);                
 
             start_p = p + 1;
         }
@@ -75,22 +69,48 @@ void version_one_deserialize(char* char_info, character_v3_t* out_character)
         ++p;
     }
 
-    sscanf(start_p, "%s%u", temp, stat_uint_token_p++);
+    sscanf(start_p, "%s%u", stat_token_p, stat_uint_token_p++);
    
     stat_uint_token_p = stat_uint_token;
+    stat_token_p = stat_token;
+    count = STAT_COUNT;
 
-    out_character->level = *stat_uint_token_p++;
-    out_character->intelligence = *stat_uint_token_p++;
-    out_character->strength = *stat_uint_token_p++;
-    out_character->dexterity = *stat_uint_token_p++;
-    out_character->armour = *stat_uint_token_p++;
-
-    sprintf(temp, "%s%u", "player_", *stat_uint_token_p++);
-
-    my_strcpy(out_character->name, temp);
-
-    out_character->health = *stat_uint_token_p++;
-    out_character->mana = *stat_uint_token_p++;
+    while (count-- == 0) {
+        switch (**stat_token_p) {
+        case 'm':
+            out_character->mana = *stat_uint_token_p;
+            break;
+        case 'h':
+            out_character->health = *stat_uint_token_p;
+            break;
+        case 's':
+            out_character->strength = *stat_uint_token_p;
+            break;
+        case 'i':
+            if (*(*stat_token_p + 1) == 'n') {
+                out_character->intelligence = *stat_uint_token_p;
+            } else {
+                sprintf(temp, "%s%u", "player_", *stat_uint_token_p++);
+                my_strcpy(out_character->name, temp);
+            }
+            break;
+        case 'd':
+            if (*(*stat_token_p + 2) == 'x') {
+                out_character->dexterity = *stat_uint_token_p;
+            } else {
+                out_character->armour = *stat_uint_token_p;
+            }
+            break;
+        case 'l':
+            out_character->level = *stat_uint_token_p;
+            break;
+        default:
+            break;
+        }
+        
+        stat_uint_token_p++;
+        stat_token++;
+    }
     
     out_character->evasion = out_character->dexterity / 2;
     out_character->leadership = out_character->level / 10;
@@ -101,11 +121,9 @@ void version_one_deserialize(char* char_info, character_v3_t* out_character)
 }
 
 
-void version_two_deserialize(char* char_info, character_v3_t* out_character)
+void deserialize_version_two(char* char_info, character_v3_t* out_character)
 {
-    char* p = char_info;
-    char* start_p = char_info;
-
+    char* char_info_p = char_info;
     char* stat_token[2];
     unsigned int stat_uint_token[10];
 
@@ -115,7 +133,7 @@ void version_two_deserialize(char* char_info, character_v3_t* out_character)
     char name[50];
     int token_count;
 
-    token_count = my_strtok(stat_token_p, char_info, '\n');
+    token_count = my_strtok(stat_token_p, char_info_p, '\n');
     assert(token_count == 2);
 
     token_count = my_stat_token(stat_uint_token, name, stat_token_p[1], ',');
@@ -138,11 +156,10 @@ void version_two_deserialize(char* char_info, character_v3_t* out_character)
     out_character->minion_count = 0;
 }
 
-void version_three_deserialize(char* char_info, character_v3_t* out_character)
-{
-    char* p = char_info;
-    char* start_p = char_info;
-    
+void deserialize_version_three(char* char_info, character_v3_t* out_character)
+{   
+    char* char_info_p = char_info;
+
     char* stat_token[6];
     unsigned int stat_uint_token[13];
   
@@ -153,7 +170,7 @@ void version_three_deserialize(char* char_info, character_v3_t* out_character)
     int token_count;
     int minion_count;
 
-    token_count = my_strtok(stat_token_p, char_info, '\n');
+    token_count = my_strtok(stat_token_p, char_info_p, '\n');
     assert(token_count > 1 && token_count < 7);
 
     token_count = my_stat_token(stat_uint_token, name, stat_token_p[1], '|');
@@ -190,6 +207,19 @@ void version_three_deserialize(char* char_info, character_v3_t* out_character)
 
         --minion_count;
     }
+}
+
+int my_strcmp(char* str1, char* str2) 
+{
+    char* str1_p = str1;
+    char* str2_p = str2;
+
+    while (*str1_p != '\0' && *str1_p == *str2_p) {
+        ++str1_p;
+        ++str2_p;
+    }
+
+    return *str1_p - *str2_p;
 }
 
 void my_strcpy(char* dest, const char* src)
@@ -248,7 +278,10 @@ int my_stat_token(unsigned int* uint_dest, char* name_dest, char* str, char deli
             *p = '\0';
             
             if (name_flag) {
-                sscanf(start_p, "%s", name_dest);
+                size_t num_read;
+                num_read = sscanf(start_p, "%.49s", name_dest);
+                name_dest[num_read] = '\0';
+
                 ++token_count;
                 name_flag = 0;
             } else {
