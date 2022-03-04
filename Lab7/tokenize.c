@@ -34,7 +34,7 @@ char** tokenize_malloc(const char* str, const char* delim)
 
                 pa_str[len] = '\0';             
                
-                tokens_p= (char**)realloc(tokens, sizeof(const char*) * ++i);
+                tokens_p = (char**) realloc(tokens, sizeof(const char*) * ++i);
 
                 tokens = tokens_p;
 
@@ -53,7 +53,7 @@ char** tokenize_malloc(const char* str, const char* delim)
         size_t len;
         char* pa_str;
        
-        tokens_p = (char**)realloc(tokens, sizeof(const char*) * ++i);
+        tokens_p = (char**) realloc(tokens, sizeof(const char*) * ++i);
 
         tokens = tokens_p;
 
