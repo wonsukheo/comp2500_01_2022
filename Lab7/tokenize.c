@@ -28,7 +28,7 @@ char** tokenize_malloc(const char* str, const char* delim)
                 }    
  
                 len = str_p - str_start_p;
-                pa_str = malloc(len);
+                pa_str = malloc(len + 1);
 
                 strncpy(pa_str, str_start_p, len);
 
