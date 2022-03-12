@@ -10,7 +10,7 @@ enum {
     PARAGRAPH_SIZE = 8
 };
 
-const char* pa_document;
+const char* s_pa_document;
 
 const char** pa_words;
 const char*** pa_sentences;
@@ -24,28 +24,28 @@ int load_document(const char* document)
 {
     size_t length;
 
+    s_pa_document = (const char*) malloc(BUFFER_SIZE);
+
     FILE* stream = fopen(document, "rb");
 
-    pa_document = malloc(BUFFER_SIZE);
- 
     if (stream == NULL) {
         fprintf(stderr, "%s: %s", "error while opening the file", document);
         return FALSE;
     }
 
-    length = fread((void*)pa_document, sizeof(char), BUFFER_SIZE, stream);
+    length = fread((void*)s_pa_document, sizeof(char), BUFFER_SIZE, stream);
 
     while (length == BUFFER_SIZE) {
         size_t multiplier = 2;
         char* temp;
         const char* p;
 
-        temp = realloc((void*)pa_document, BUFFER_SIZE * multiplier);      
-        pa_document = temp;
-        p = pa_document + BUFFER_SIZE * (multiplier++ - 1);
+        temp = (char*)realloc((void*)s_pa_document, BUFFER_SIZE * multiplier);
+        s_pa_document = temp;
+        p = s_pa_document + BUFFER_SIZE * (multiplier++ - 1);
 
-        length = fread((void*)p, sizeof(char), BUFFER_SIZE, stream);     
-    }    
+        length = fread((void*)p, sizeof(char), BUFFER_SIZE, stream);
+    }
 
     if (fclose(stream) != 0) {
         fprintf(stderr, "%s: %s", "error while closing the file", document);
@@ -57,31 +57,24 @@ int load_document(const char* document)
 
 void dispose(void)
 {
-    free((void*)pa_document);
-    free((void*)pa_words);
-    free((void*)pa_sentences);
-    free((void*)pa_paragraphs);
-    free((void*)pa_document);
+    free((void*)s_pa_document);
 }
 
 void analyze_document(void)
 {
+    pa_words = (const char**) malloc(sizeof(char*) * WORDS_SIZE);
     const char** words_p = pa_words;
+
+    pa_sentences = (const char***) malloc(sizeof(char*) * SENTENCES_SIZE);
     const char*** sentences_p = pa_sentences;
+
+    pa_paragraphs = (const char****) malloc(sizeof(char*) * PARAGRAPH_SIZE);
     const char**** paragraphs_p = pa_paragraphs;
 
-    const char* p = pa_document;
+    const char* p = s_pa_document;
     const char* word_start_p = p;
     const char** sentence_start_p = words_p;
     const char*** paragraph_start_p = sentences_p;
-
-    pa_words = malloc(sizeof(char*) * WORDS_SIZE);
-  
-    pa_sentences = malloc(sizeof(char*) * SENTENCES_SIZE);
-
-    pa_paragraphs = malloc(sizeof(char*) * PARAGRAPH_SIZE);
-    
-    pa_document = malloc(sizeof(char*));
 
     while (*p != '\0') {
         if (*p == ' ' || *p == ',' || *p == '.' || *p == '!' || *p == '?') {
@@ -90,31 +83,30 @@ void analyze_document(void)
                 goto next;
             }
 
-            *words_p++ = word_start_p;       
-            word_start_p = p + 1;       
+            *words_p++ = word_start_p;
+            word_start_p = p + 1;
+            ++words_count;
 
             if (*p == '.' || *p == '!' || *p == '?') {
                 *sentences_p++ = sentence_start_p;
                 sentence_start_p = words_p + 1;
+                ++sentences_count;
             }
-        } 
-   
+        }
+
         if (*p == '\n') {
             if (*(p + 1) == '\n') {
                 ++word_start_p;
                 goto next;
             }
-            
+
             ++word_start_p;
             *paragraphs_p++ = paragraph_start_p;
             paragraph_start_p = sentences_p + 1;
+            ++paragraphs_count;
         }
 
-    next:       
+    next:
         ++p;
     }
-
-    printf("%d, %d, %d", words_count, sentences_count, paragraphs_count);
 }
-
-
