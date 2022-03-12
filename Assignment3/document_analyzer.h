@@ -6,6 +6,8 @@
 
 int load_document(const char* document);
 
+void analyze_document(void);
+
 void dispose(void);
 
 size_t get_total_word_count(void);
@@ -20,7 +22,7 @@ size_t get_paragraph_word_count(const char*** paragraph);
 
 size_t get_paragraph_sentence_count(const char*** paragraph);
 
-const char** get_sentence_or_null(const size_t paragraph_index, const size_t sentence_index)l
+const char** get_sentence_or_null(const size_t paragraph_index, const size_t sentence_index);
 
 size_t get_sentence_word_count(const char** sentence);
 
