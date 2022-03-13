@@ -345,6 +345,10 @@ int print_as_tree(const char* filename)
     words_in_sentence_p = pa_words_in_sentence;
     sentences_in_paragraph_p = pa_sentences_in_paragraph;
 
+    if (s_pa_document == NULL) {
+        return FALSE;
+    }
+
     while (paragraph_index < g_paragraphs_count) {
         pp += sprintf(pp, "%s %u:\n", "Paragraph", paragraph_index);
 
