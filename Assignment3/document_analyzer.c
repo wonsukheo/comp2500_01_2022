@@ -13,7 +13,7 @@ enum {
     COUNT_SIZE = 32
 };
 
-const char* s_pa_document;
+const char* s_pa_document = NULL;
 
 const char** s_pa_words;
 const char*** s_pa_sentences;
@@ -38,10 +38,8 @@ size_t g_paragraphs_count = 0;
 
 int load_document(const char* document)
 {
-    size_t multiplier;
+    size_t multiplier = 2;
     FILE* stream;
-
-    s_pa_document = (const char*)malloc(BUFFER_SIZE);
 
     stream = fopen(document, "r");
 
@@ -50,20 +48,19 @@ int load_document(const char* document)
         return FALSE;
     }
 
-    doc_length = fread((void*)s_pa_document, sizeof(char), BUFFER_SIZE, stream);
+    s_pa_document = malloc(BUFFER_SIZE);
 
-    multiplier = 2;
+    doc_length = fread((void*)s_pa_document, sizeof(char), BUFFER_SIZE, stream);
     
     if (doc_length == 0) {
-        s_pa_document == NULL;
+        s_pa_document = NULL;
     }
 
     while (doc_length == BUFFER_SIZE) {
-        char* temp;
         const char* p;
 
-        temp = (char*)realloc((void*)s_pa_document, BUFFER_SIZE * multiplier);
-        s_pa_document = temp;
+        s_pa_document = realloc((void*)s_pa_document, BUFFER_SIZE * multiplier);
+
         p = s_pa_document + BUFFER_SIZE * (multiplier++ - 1);
 
         doc_length = fread((void*)p, sizeof(char), BUFFER_SIZE, stream);
@@ -74,7 +71,9 @@ int load_document(const char* document)
         return FALSE;
     }
 
-    analyze_document();
+    if (s_pa_document != NULL) {
+        analyze_document();
+    }
 
     return TRUE;
 }
@@ -120,12 +119,17 @@ void dispose(void)
     free(s_pa_paragraphs);
     s_pa_paragraphs = NULL;
 
-
     free((void*)s_pa_document);
+    s_pa_document = NULL;
 
     free(pa_char_in_word);
+    pa_char_in_word = NULL;
+
     free(pa_words_in_sentence);
+    pa_words_in_sentence = NULL;
+
     free(pa_sentences_in_paragraph);
+    pa_words_in_sentence = NULL;
 }
 
 void analyze_document(void)
@@ -187,7 +191,7 @@ void analyze_document(void)
             }
         } 
 
-        if (*p == '\n' || (p + 1) - s_pa_document == doc_length && doc_length != 0) {
+        if (*p == '\n' || (p + 1) - s_pa_document == (int)doc_length) {
             const char*** pa_temp;
 
             ++word_start_p;
@@ -237,7 +241,7 @@ size_t get_total_paragraph_count(void)
 
 const char*** get_paragraph_or_null(const size_t paragraph_index)
 {
-    if (paragraph_index >= g_paragraphs_count) {
+    if (paragraph_index >= g_paragraphs_count || g_paragraphs_count == 0 || s_pa_document == NULL) {
         return NULL;
     }
 
