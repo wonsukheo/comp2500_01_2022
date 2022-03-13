@@ -31,13 +31,13 @@ size_t* char_in_word_p;
 size_t* words_in_sentence_p;
 size_t* sentences_in_paragraph_p;
 
+size_t doc_length =0;
 size_t g_words_count = 0;
 size_t g_sentences_count = 0;
 size_t g_paragraphs_count = 0;
 
 int load_document(const char* document)
 {
-    size_t length;
     size_t multiplier;
     FILE* stream;
 
@@ -50,11 +50,15 @@ int load_document(const char* document)
         return FALSE;
     }
 
-    length = fread((void*)s_pa_document, sizeof(char), BUFFER_SIZE, stream);
+    doc_length = fread((void*)s_pa_document, sizeof(char), BUFFER_SIZE, stream);
 
     multiplier = 2;
+    
+    if (doc_length == 0) {
+        s_pa_document == NULL;
+    }
 
-    while (length == BUFFER_SIZE) {
+    while (doc_length == BUFFER_SIZE) {
         char* temp;
         const char* p;
 
@@ -62,7 +66,7 @@ int load_document(const char* document)
         s_pa_document = temp;
         p = s_pa_document + BUFFER_SIZE * (multiplier++ - 1);
 
-        length = fread((void*)p, sizeof(char), BUFFER_SIZE, stream);
+        doc_length = fread((void*)p, sizeof(char), BUFFER_SIZE, stream);
     }
 
     if (fclose(stream) != 0) {
@@ -183,7 +187,7 @@ void analyze_document(void)
             }
         } 
 
-        if (*p == '\n' || *(p + 1) == '\0') {
+        if (*p == '\n' || (p + 1) - s_pa_document == doc_length && doc_length != 0) {
             const char*** pa_temp;
 
             ++word_start_p;
