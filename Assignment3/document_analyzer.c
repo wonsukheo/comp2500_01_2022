@@ -4,6 +4,10 @@
 
 #include "document_analyzer.h"
 
+enum {
+    BUFFER_SIZE = 4096
+};
+
 static size_t s_words_count = 0;
 static size_t s_sentences_count = 0;
 static size_t s_paragraphs_count = 0;
@@ -13,11 +17,14 @@ static char**** s_pa_document_p = NULL;
 int load_document(const char* document)
 {
     const char* pa_document;
+    const char* pa_document_p;
+
     FILE* stream;
     size_t doc_length = 0;
     size_t words_count = 0;
     size_t sentences_count = 0;
     size_t paragraphs_count = 0;
+    size_t multiple = 2;
 
     char** temp_words;   
     char** temp_sentences;
@@ -37,20 +44,25 @@ int load_document(const char* document)
     }
 
     dispose();
- 
-    fseek(stream, 0, SEEK_END);
-    doc_length = ftell(stream);
 
-    pa_document = malloc(doc_length + 1);
-    memset((void*)pa_document, 0, doc_length + 1);
-
-    fseek(stream, 0, SEEK_SET);
-    fread((void*)pa_document, doc_length, sizeof(char), stream);
+    pa_document = malloc(sizeof(char) * BUFFER_SIZE);
+    doc_length = fread((void*)pa_document, sizeof(char), BUFFER_SIZE, stream);
 
     if (doc_length == 0) {
         goto exit;
-    }
+    } 
 
+    if (doc_length == BUFFER_SIZE) {
+        while (doc_length == BUFFER_SIZE * (multiple - 1)) {
+            pa_document = realloc((void*)pa_document, sizeof(char) * (BUFFER_SIZE * multiple));
+            pa_document_p = pa_document + BUFFER_SIZE * (multiple - 1);
+
+            doc_length += fread((void*)pa_document_p, sizeof(char), BUFFER_SIZE, stream);         
+        }            
+    } 
+      
+    pa_document = realloc((void*)pa_document, sizeof(char) * doc_length);
+   
     temp_paragraphs = tokenize_malloc(pa_document, "\n", &paragraphs_count);
     s_paragraphs_count += paragraphs_count;
     s_pa_document_p = malloc((paragraphs_count + 1) * sizeof(char***));
