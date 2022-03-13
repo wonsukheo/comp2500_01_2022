@@ -4,17 +4,15 @@
 
 #include "document_analyzer.h"
 
-#pragma warning(disable : 4996)
-
 static size_t s_words_count = 0;
 static size_t s_sentences_count = 0;
 static size_t s_paragraphs_count = 0;
 
-const char* s_pa_document;
 static char**** s_pa_document_p = NULL;
 
 int load_document(const char* document)
 {
+    const char* pa_document;
     FILE* stream;
     size_t doc_length = 0;
     size_t words_count = 0;
@@ -43,17 +41,17 @@ int load_document(const char* document)
     fseek(stream, 0, SEEK_END);
     doc_length = ftell(stream);
 
-    s_pa_document = malloc(doc_length + 1);
-    memset((void*)s_pa_document, 0, doc_length + 1);
+    pa_document = malloc(doc_length + 1);
+    memset((void*)pa_document, 0, doc_length + 1);
 
     fseek(stream, 0, SEEK_SET);
-    fread((void*)s_pa_document, doc_length, sizeof(char), stream);
+    fread((void*)pa_document, doc_length, sizeof(char), stream);
 
-    if (doc_length ==0) {
+    if (doc_length == 0) {
         goto exit;
     }
 
-    temp_paragraphs = tokenize_malloc(s_pa_document, "\n", &paragraphs_count);
+    temp_paragraphs = tokenize_malloc(pa_document, "\n", &paragraphs_count);
     s_paragraphs_count += paragraphs_count;
     s_pa_document_p = malloc((paragraphs_count + 1) * sizeof(char***));
     s_pa_document_p[paragraphs_count] = NULL;
@@ -108,8 +106,8 @@ exit:
         return FALSE;    
     }
     
-    free((void*)s_pa_document);
-    s_pa_document = NULL;
+    free((void*)pa_document);
+    pa_document = NULL;
     
     return TRUE;  
 }
