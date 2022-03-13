@@ -23,15 +23,15 @@ const char** words_p;
 const char*** sentences_p;
 const char**** paragraphs_p;
 
-size_t* pa_char_in_word;
-size_t* pa_words_in_sentence;
-size_t* pa_sentences_in_paragraph;
+size_t* g_pa_char_in_word;
+size_t* g_pa_words_in_sentence;
+size_t* g_pa_sentences_in_paragraph;
 
-size_t* char_in_word_p;
-size_t* words_in_sentence_p;
-size_t* sentences_in_paragraph_p;
+size_t* g_char_in_word_p;
+size_t* g_words_in_sentence_p;
+size_t* g_sentences_in_paragraph_p;
 
-size_t doc_length = 0;
+size_t g_doc_length = 0;
 size_t g_words_count = 0;
 size_t g_sentences_count = 0;
 size_t g_paragraphs_count = 0;
@@ -52,23 +52,23 @@ int load_document(const char* document)
 
     s_pa_document = malloc(BUFFER_SIZE);
 
-    doc_length = fread((void*)s_pa_document, sizeof(char), BUFFER_SIZE, stream);
+    g_doc_length = fread((void*)s_pa_document, sizeof(char), BUFFER_SIZE, stream);
     
-    s_pa_document = realloc((void*)s_pa_document, sizeof(char) * doc_length);
+    s_pa_document = realloc((void*)s_pa_document, sizeof(char) * g_doc_length);
 
-    if (doc_length == 0) {
-        free(s_pa_document);
+    if (g_doc_length == 0) {
+        free((void*)s_pa_document);
         s_pa_document = NULL;        
     }
 
-    while (doc_length == BUFFER_SIZE) {
+    while (g_doc_length == BUFFER_SIZE) {
         const char* p;
 
         s_pa_document = realloc((void*)s_pa_document, BUFFER_SIZE * multiplier);
 
         p = s_pa_document + BUFFER_SIZE * (multiplier++ - 1);
 
-        doc_length = fread((void*)p, sizeof(char), BUFFER_SIZE, stream);
+        g_doc_length = fread((void*)p, sizeof(char), BUFFER_SIZE, stream);
     }  
 
     if (fclose(stream) != 0) {
@@ -90,18 +90,18 @@ void dispose(void)
     size_t word_index = 0;
 
     paragraphs_p = s_pa_paragraphs;
-    sentences_in_paragraph_p = pa_sentences_in_paragraph;
-    words_in_sentence_p = pa_words_in_sentence;
+    g_sentences_in_paragraph_p = g_pa_sentences_in_paragraph;
+    g_words_in_sentence_p = g_pa_words_in_sentence;
 
     while (paragraph_index < g_paragraphs_count) {
-        while (sentence_index < *sentences_in_paragraph_p) {
-            while (word_index < *words_in_sentence_p) {
+        while (sentence_index < *g_sentences_in_paragraph_p) {
+            while (word_index < *g_words_in_sentence_p) {
                 free((void*)paragraphs_p[paragraph_index][sentence_index][word_index]);
                 paragraphs_p[paragraph_index][sentence_index][word_index++] = NULL;
             }
 
             word_index = 0;
-            ++words_in_sentence_p;
+            ++g_words_in_sentence_p;
 
             free(paragraphs_p[paragraph_index][sentence_index]);
             paragraphs_p[paragraph_index][sentence_index++] = NULL;
@@ -112,7 +112,7 @@ void dispose(void)
 
         sentence_index = 0;
 
-        ++sentences_in_paragraph_p;
+        ++g_sentences_in_paragraph_p;
     }
 
     free(s_pa_words);
@@ -127,14 +127,14 @@ void dispose(void)
     free((void*)s_pa_document);
     s_pa_document = NULL;
 
-    free(pa_char_in_word);
-    pa_char_in_word = NULL;
+    free(g_pa_char_in_word);
+    g_pa_char_in_word = NULL;
 
-    free(pa_words_in_sentence);
-    pa_words_in_sentence = NULL;
+    free(g_pa_words_in_sentence);
+    g_pa_words_in_sentence = NULL;
 
-    free(pa_sentences_in_paragraph);
-    pa_words_in_sentence = NULL;
+    free(g_pa_sentences_in_paragraph);
+    g_pa_words_in_sentence = NULL;
 
     g_words_count = 0;
     g_sentences_count = 0;
@@ -158,14 +158,14 @@ void analyze_document(void)
     s_pa_paragraphs = (const char****)malloc(sizeof(char***) * PARAGRAPH_SIZE);
     paragraphs_p = s_pa_paragraphs;
 
-    pa_words_in_sentence = (size_t*)malloc(sizeof(size_t) * COUNT_SIZE);
-    words_in_sentence_p = pa_words_in_sentence;
+    g_pa_words_in_sentence = (size_t*)malloc(sizeof(size_t) * COUNT_SIZE);
+    g_words_in_sentence_p = g_pa_words_in_sentence;
 
-    pa_sentences_in_paragraph = (size_t*)malloc(sizeof(size_t) * COUNT_SIZE);
-    sentences_in_paragraph_p = pa_sentences_in_paragraph;
+    g_pa_sentences_in_paragraph = (size_t*)malloc(sizeof(size_t) * COUNT_SIZE);
+    g_sentences_in_paragraph_p = g_pa_sentences_in_paragraph;
 
-    pa_char_in_word = (size_t*)malloc(sizeof(size_t) * WORDS_SIZE);
-    char_in_word_p = pa_char_in_word;
+    g_pa_char_in_word = (size_t*)malloc(sizeof(size_t) * WORDS_SIZE);
+    g_char_in_word_p = g_pa_char_in_word;
 
     while (*p != '\0') {
         if (*p == ' ' || *p == ',' || *p == '.' || *p == '!' || *p == '?') {
@@ -174,7 +174,7 @@ void analyze_document(void)
                 goto next;
             }
 
-            *char_in_word_p++ = p - word_start_p;
+            *g_char_in_word_p++ = p - word_start_p;
             pa_word = malloc(p - word_start_p + 1);
             memcpy(pa_word, word_start_p, p - word_start_p);
             pa_word[p - word_start_p] = '\0';
@@ -191,7 +191,7 @@ void analyze_document(void)
 
                 ++sentences_count;
 
-                *words_in_sentence_p++ = words_count;
+                *g_words_in_sentence_p++ = words_count;
 
                 g_words_count += words_count;
                 words_count = 0;
@@ -200,7 +200,7 @@ void analyze_document(void)
             }
         } 
 
-        if (*p == '\n' || (p + 1) - s_pa_document == (int)doc_length) {
+        if (*p == '\n' || (p + 1) - s_pa_document == (int)g_doc_length) {
             const char*** pa_temp;
 
             ++word_start_p;
@@ -216,7 +216,7 @@ void analyze_document(void)
 
             ++g_paragraphs_count;
 
-            *sentences_in_paragraph_p++ = sentences_count;
+            *g_sentences_in_paragraph_p++ = sentences_count;
 
             g_sentences_count += sentences_count;
             sentences_count = 0;
@@ -228,9 +228,9 @@ void analyze_document(void)
         ++p;
     }
 
-    pa_char_in_word = realloc(pa_char_in_word, sizeof(size_t) * g_words_count);
-    pa_words_in_sentence = realloc(pa_words_in_sentence, sizeof(size_t) * g_sentences_count);
-    pa_sentences_in_paragraph = realloc(pa_sentences_in_paragraph, sizeof(size_t) * g_paragraphs_count);
+    g_pa_char_in_word = realloc(g_pa_char_in_word, sizeof(size_t) * g_words_count);
+    g_pa_words_in_sentence = realloc(g_pa_words_in_sentence, sizeof(size_t) * g_sentences_count);
+    g_pa_sentences_in_paragraph = realloc(g_pa_sentences_in_paragraph, sizeof(size_t) * g_paragraphs_count);
 }
 
 size_t get_total_word_count(void)
@@ -269,16 +269,16 @@ size_t get_paragraph_word_count(const char*** paragraph)
             break;
         }
         else {
-            index += *(pa_sentences_in_paragraph + i);
+            index += *(g_pa_sentences_in_paragraph + i);
         }
 
         ++i;
     }
 
-    sentences_count = *(pa_sentences_in_paragraph + i);
+    sentences_count = *(g_pa_sentences_in_paragraph + i);
 
     for (i = index; i < index + sentences_count; ++i) {
-        words_count += *(pa_words_in_sentence + i);
+        words_count += *(g_pa_words_in_sentence + i);
     }
 
     return words_count;
@@ -297,7 +297,7 @@ size_t get_paragraph_sentence_count(const char*** paragraph)
         ++i;
     }
 
-    sentences_count = *(pa_sentences_in_paragraph + i);
+    sentences_count = *(g_pa_sentences_in_paragraph + i);
 
     return sentences_count;
 }
@@ -310,7 +310,7 @@ const char** get_sentence_or_null(const size_t paragraph_index, const size_t sen
         return NULL;
     }
 
-    if (sentence_index >= *(pa_sentences_in_paragraph + paragraph_index)) {
+    if (sentence_index >= *(g_pa_sentences_in_paragraph + paragraph_index)) {
         return NULL;
     }
 
@@ -330,17 +330,17 @@ size_t get_sentence_word_count(const char** sentence)
 
         ++sentence_index;
 
-        if (sentence_index == pa_sentences_in_paragraph[paragraph_index]) {
+        if (sentence_index == g_pa_sentences_in_paragraph[paragraph_index]) {
             ++paragraph_index;
             sentence_index = 0;
         }
     }
 
     while (paragraph_index-- != 0) {
-        index += pa_sentences_in_paragraph[paragraph_index];
+        index += g_pa_sentences_in_paragraph[paragraph_index];
     }
 
-    return *(pa_words_in_sentence + index + sentence_index);
+    return *(g_pa_words_in_sentence + index + sentence_index);
 }
 
 int print_as_tree(const char* filename)
@@ -354,9 +354,9 @@ int print_as_tree(const char* filename)
     char* pp = p;
 
     paragraphs_p = s_pa_paragraphs;
-    char_in_word_p = pa_char_in_word;
-    words_in_sentence_p = pa_words_in_sentence;
-    sentences_in_paragraph_p = pa_sentences_in_paragraph;
+    g_char_in_word_p = g_pa_char_in_word;
+    g_words_in_sentence_p = g_pa_words_in_sentence;
+    g_sentences_in_paragraph_p = g_pa_sentences_in_paragraph;
 
     if (s_pa_document == NULL) {
         return FALSE;
@@ -365,19 +365,19 @@ int print_as_tree(const char* filename)
     while (paragraph_index < g_paragraphs_count) {
         pp += sprintf(pp, "%s %u:\n", "Paragraph", paragraph_index);
 
-        while (sentence_index < *sentences_in_paragraph_p) {
+        while (sentence_index < *g_sentences_in_paragraph_p) {
             pp += sprintf(pp, "    %s %u:\n", "Sentence", sentence_index);
 
-            while (word_index < *words_in_sentence_p) {
+            while (word_index < *g_words_in_sentence_p) {
                 pp += sprintf(pp, "        ");
-                memcpy(pp, s_pa_paragraphs[paragraph_index][sentence_index][word_index++], sizeof(char) * *char_in_word_p);
-                pp += sizeof(char) * *char_in_word_p++;
+                memcpy(pp, s_pa_paragraphs[paragraph_index][sentence_index][word_index++], sizeof(char) * *g_char_in_word_p);
+                pp += sizeof(char) * *g_char_in_word_p++;
                 pp += sprintf(pp, "\n");
             }
 
             word_index = 0;
 
-            ++words_in_sentence_p;
+            ++g_words_in_sentence_p;
             ++sentence_index;
         }
 
@@ -389,7 +389,7 @@ int print_as_tree(const char* filename)
 
         sentence_index = 0;
 
-        ++sentences_in_paragraph_p;
+        ++g_sentences_in_paragraph_p;
         ++paragraph_index;
     }
 
