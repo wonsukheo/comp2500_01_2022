@@ -6,7 +6,7 @@
 
 int load_document(const char* document);
 
-void analyze_document(void);
+char** tokenize_malloc(const char* str, const char* delim, size_t* out_count);
 
 void dispose(void);
 
