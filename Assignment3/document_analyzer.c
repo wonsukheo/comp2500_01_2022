@@ -31,7 +31,7 @@ size_t* char_in_word_p;
 size_t* words_in_sentence_p;
 size_t* sentences_in_paragraph_p;
 
-size_t doc_length =0;
+size_t doc_length;
 size_t g_words_count = 0;
 size_t g_sentences_count = 0;
 size_t g_paragraphs_count = 0;
@@ -65,6 +65,8 @@ int load_document(const char* document)
 
         doc_length = fread((void*)p, sizeof(char), BUFFER_SIZE, stream);
     }
+
+    s_pa_document = realloc((void*)s_pa_document, sizeof(char) * doc_length);
 
     if (fclose(stream) != 0) {
         fprintf(stderr, "%s: %s", "error while closing the file", document);
@@ -130,6 +132,10 @@ void dispose(void)
 
     free(pa_sentences_in_paragraph);
     pa_words_in_sentence = NULL;
+
+    g_words_count = 0;
+    g_sentences_count = 0;
+    g_paragraphs_count = 0;
 }
 
 void analyze_document(void)
