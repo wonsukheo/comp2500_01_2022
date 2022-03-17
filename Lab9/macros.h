@@ -11,6 +11,9 @@
 
 #define RANGE_DESC(curr, max, min) for (curr = max; curr >= min; --curr) 
 
-#define SET(ary, start, count, value) { size_t i; for (i = start; i < start + count; ++i) { ary[i] = value; } }
+#define SET(ary, start, count, value) do { size_t i = start;    \
+                                      while (i < start + count) \
+                                      { ary[i++] = value; } }   \
+                                      while (0)                 \
 
 #endif /* MACROS_H */
