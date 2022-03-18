@@ -15,7 +15,7 @@
 
 #define SET(ary, start, count, value) do { size_t i = start;    \
                                       while (i < ((start) + (count))) \
-                                      { ary[i++] = value; } }   \
+                                      { *(ary + i++) = value; } }   \
                                       while (0)                 \
 
 #endif /* MACROS_H */
