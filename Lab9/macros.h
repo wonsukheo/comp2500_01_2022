@@ -14,7 +14,7 @@
                                    for (curr = (max); curr >= (min); --curr) \
 
 #define SET(ary, start, count, value) do { size_t i = start;    \
-                                      while (i < start + count) \
+                                      while (i < ((start) + (count))) \
                                       { ary[i++] = value; } }   \
                                       while (0)                 \
 
