@@ -30,7 +30,7 @@ void finalize_todo_list(todo_list_t* todo_list)
 
 bool add_todo(todo_list_t* todo_list, const int32_t priority, const char* task)
 {
-    if (todo_list->cur_size == todo_list->max_size) {
+    if (todo_list->cur_size >= todo_list->max_size) {
         return false;    
     }
 
@@ -38,25 +38,28 @@ bool add_todo(todo_list_t* todo_list, const int32_t priority, const char* task)
     
     list.priority = priority;
     list.task = task;
-    list.next = NULL;
-
-    list_t* head = todo_list->head;
     
-    if (head == NULL) {
-        head = list;
+    if (todo_list->cur_size == 0) {
+        todo_list->head = &list;
+        list.next = NULL;
+        ++(todo_list->cur_size);
+
         return true;
     }
- 
-    while (head->next != NULL) {
-        list_t prev_node = NULL;
 
-        if (list.priority > head->priority) {
-            list.next = head;
+    list_t* next_node = todo_list->head;
+    list_t* prev_node = todo_list->head;
+ 
+    while (next_node->next != NULL) {
+
+
+        if (list.priority > next_node->priority) {
+            list.next = next_node;
             
-            if (todo_list->head == head) {
-                todo_list->head = &list;
-            }
+            prev_node = &list;
         } 
+
+        next_node = next_node->next;
     }    
 
     head = list;
