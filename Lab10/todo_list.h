@@ -8,7 +8,7 @@ typedef struct todo todo_t;
 
 typedef struct todo {
     int32_t priority;
-    char* pa_task;
+    char todo_task[64];
     todo_t* next;
 } todo_t;
 
