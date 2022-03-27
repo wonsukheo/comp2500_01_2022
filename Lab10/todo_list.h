@@ -4,16 +4,19 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct {
+typedef struct todo todo_t;
+
+typedef struct todo {
     int32_t priority;
-    char* task;
-    list_t* next;
-} list_t;
+    const char* task;
+    todo_t* next;
+} todo_t;
 
 typedef struct todo_list {
     size_t max_size;
     size_t cur_size;
-    list_t* head;
+    todo_t* head;
+    void* pa;
 } todo_list_t;
 
 todo_list_t init_todo_list(size_t max_size);
