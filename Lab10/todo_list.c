@@ -5,7 +5,7 @@
 
 todo_list_t init_todo_list(size_t max_size)
 {
-    todo_list_t* pa_todo_list = (todo_list_t)malloc(sizeof(todo_list_t));
+    todo_list_t* pa_todo_list = (todo_list_t*)malloc(sizeof(todo_list_t));
     pa_todo_list->max_size = max_size;
     pa_todo_list->cur_size = 0;
     pa_todo_list->next = NULL;
@@ -34,19 +34,19 @@ bool add_todo(todo_list_t* todo_list, const int32_t priority, const char* task)
         return false;    
     }
 
-    list_t list = malloc(sizeof(list_t));
+    list_t* list = (list_t*)malloc(sizeof(list_t));
     
-    list.priority = priority;
-    list.task = task;
+    list->priority = priority;
+    list->task = task;
 
     list_t** prev_node = &(todo_list->head);
     list_t* next_node = todo_list->head;
  
     while (next_node != NULL) {
-        if (list.priority > next_node->priority) {
-            list.next = next_node;
+        if (list->priority > next_node->priority) {
+            list->next = next_node;
             
-            *prev_node = &list;
+            *prev_node = list;
             
             goto ret;
         } 
@@ -54,8 +54,8 @@ bool add_todo(todo_list_t* todo_list, const int32_t priority, const char* task)
         next_node = next_node->next;
     }    
 
-    next_node = &list;
-    list.next = NULL;
+    next_node = list;
+    list->next = NULL;
 
 ret: 
     ++(todo_list->cur_size);
