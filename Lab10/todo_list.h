@@ -8,7 +8,7 @@ typedef struct todo todo_t;
 
 typedef struct todo {
     int32_t priority;
-    const char* task;
+    char* pa_task;
     todo_t* next;
 } todo_t;
 
@@ -32,5 +32,7 @@ const char* peek_or_null(const todo_list_t* todo_list);
 size_t get_count(const todo_list_t* todo_list);
 
 bool is_empty(const todo_list_t* todo_list);
+
+size_t my_strlen(const char* str);
 
 #endif /* TODO_LIST_H */

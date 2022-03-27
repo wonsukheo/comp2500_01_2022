@@ -20,7 +20,8 @@ void finalize_todo_list(todo_list_t* todo_list)
 
     while (p != NULL) {
         todo_t* temp = p->next;
-
+        
+        free(p->pa_task);
         free(p);
         
         p = temp;
@@ -38,8 +39,10 @@ bool add_todo(todo_list_t* todo_list, const int32_t priority, const char* task)
     todo_t* list = (todo_t*)malloc(sizeof(todo_t));
 
     list->priority = priority;
-    list->task = task;
 
+    list->pa_task = (char*)malloc(sizeof(char) * my_strlen(task));  
+    snprintf(list->pa_task, my_strlen(task), "%s", task);
+   
     todo_t** prev_node = &(todo_list->head);
     todo_t** next_node = &(todo_list->head);
 
@@ -75,6 +78,7 @@ bool complete_todo(todo_list_t* todo_list)
 
     todo_list->head = temp->next;
 
+    free(temp->pa_task);
     free(temp);
 
     --(todo_list->cur_size);
@@ -84,7 +88,7 @@ bool complete_todo(todo_list_t* todo_list)
 
 const char* peek_or_null(const todo_list_t* todo_list)
 {
-    return (todo_list->head == NULL) ? NULL : (todo_list->head)->task;
+    return (todo_list->head == NULL) ? NULL : (todo_list->head)->pa_task;
 }
 
 size_t get_count(const todo_list_t* todo_list)
@@ -95,5 +99,15 @@ size_t get_count(const todo_list_t* todo_list)
 bool is_empty(const todo_list_t* todo_list)
 {
     return (todo_list->cur_size == 0) ? true : false;
+}
+
+size_t my_strlen(const char* str)
+{
+    const char* p = str;
+
+    while (*p++ != '\0') {
+    }
+
+    return p - str;
 }
 
