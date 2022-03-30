@@ -186,7 +186,8 @@ void destroy(hashmap_t* hashmap)
 
         free(*p++);
     }
-
+    
+    free(p);
     free(hashmap);
 }
 
