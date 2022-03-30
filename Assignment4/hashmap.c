@@ -186,6 +186,8 @@ void destroy(hashmap_t* hashmap)
 
         free(*p++);
     }
+
+    free(hashmap);
 }
 
 size_t my_strlen(const char* str)
