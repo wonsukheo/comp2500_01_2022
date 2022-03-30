@@ -136,8 +136,8 @@ int remove_key(hashmap_t* hashmap, const char* key)
             free(temp->key);
             free(temp);
         } else {
-             free((*p)->key);
-             free(*p);
+            free((*p)->key);
+            free(*p);
 
             *(hashmap->plist + hash_val) = NULL;
         }
