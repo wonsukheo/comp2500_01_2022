@@ -125,14 +125,20 @@ int remove_key(hashmap_t* hashmap, const char* key)
 
     if (*p == NULL) {
         return FALSE;
-    } else if (my_strcmp(key, (*p)->key) == 0) {
+    } 
+
+    if (my_strcmp(key, (*p)->key) == 0) {
         if ((*p)->next != NULL) {
             node_t* temp = *p;
 
             *(hashmap->plist + hash_val) = (*p)->next;
             
+            free(temp->key);
             free(temp);
         } else {
+             free((*p)->key);
+             free(*p);
+
             *(hashmap->plist + hash_val) = NULL;
         }
 
@@ -148,8 +154,12 @@ int remove_key(hashmap_t* hashmap, const char* key)
 
                 next_p = &(*next_p)->next;
  
+                free(temp->key);
                 free(temp);
             } else { 
+                free((*next_p)->key);
+                free(*next_p);
+
                 next_p = NULL;
             }
 
@@ -184,10 +194,11 @@ void destroy(hashmap_t* hashmap)
             free(temp);        
         }           
 
+        free((*p)->key);
         free(*p++);
     }
     
-    free(p);
+    free(hashmap->plist);
     free(hashmap);
 }
 
