@@ -12,6 +12,4 @@ bool update_email(user_t** users_or_null, size_t id, const char* email);
 
 bool update_password(user_t** users_or_null, size_t id, const char* password);
 
-static void mask_info(char* info, char c);
-
 #endif /* DATA_STORE_H */

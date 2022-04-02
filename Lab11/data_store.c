@@ -5,9 +5,45 @@
 
 #define LOG_FILE "log.txt"
 
+#if defined (RELEASE)
+
+static void mask_info(char* info, char c) 
+{
+    char* p = info;
+
+    while (*p++ != c) {
+    }
+    
+    size_t len = p - info - 1;
+    p = info;
+
+    if (len == 1) {
+        *p = '*';
+
+        return;
+    } else if (len == 2) {
+        *++p = '*';
+        
+        return;
+    }
+
+    p = info + 1;
+    size_t i = 0;
+
+    while (i++ < len - 2) {
+        *p++ = '*';        
+    }          
+}
+
+#endif /* RELEASE */
+
 user_t* get_user_by_id_or_null(user_t** users_or_null, size_t id)
 {
     user_t** user = users_or_null;
+    
+    if (user == NULL) {
+        return NULL;
+    }
 
     while (*user != NULL) {
         if ((*user)->id == id) {
@@ -24,6 +60,10 @@ user_t* get_user_by_username_or_null(user_t** users_or_null, const char* usernam
 {
     user_t** user = users_or_null;
 
+    if (user == NULL) {
+        return NULL;
+    }
+
     while (*user != NULL) {
         if (strncmp((*user)->username, username, 50) == 0) {
             return *user;
@@ -39,6 +79,10 @@ bool update_email(user_t** users_or_null, size_t id, const char* email)
 {
     user_t** user = users_or_null;
 
+    if (user == NULL) {
+        return false;
+    }
+
     while ((*user) != NULL) {
         if ((*user)->id == id) {
             char old_email[LENGTH];
@@ -49,12 +93,12 @@ bool update_email(user_t** users_or_null, size_t id, const char* email)
 
             memcpy((*user)->email, email, LENGTH);
        
-            #if defined (RELEASE)
+#if defined (RELEASE)
             
             mask_info(old_email, '@');
             mask_info(new_email, '@');
 
-            #endif /* RELEASE */
+#endif /* RELEASE */
            
             {
                 FILE* stream = fopen(LOG_FILE, "a+");
@@ -91,6 +135,10 @@ bool update_password(user_t** users_or_null, size_t id, const char* password)
 {
     user_t** user = users_or_null;
 
+    if (user == NULL) {
+        return false;
+    }
+
     while ((*user) != NULL) {
         if ((*user)->id == id) {
             char old_password[LENGTH];
@@ -101,12 +149,12 @@ bool update_password(user_t** users_or_null, size_t id, const char* password)
 
             memcpy((*user)->password, password, LENGTH);
        
-            #if defined (RELEASE)
+#if defined (RELEASE)
             
             mask_info(old_password, '\0');
             mask_info(new_password, '\0');       
 
-            #endif /* RELEASE */       
+#endif /* RELEASE */       
  
             {
                 FILE* stream = fopen(LOG_FILE, "a+");
@@ -137,32 +185,4 @@ bool update_password(user_t** users_or_null, size_t id, const char* password)
     }    
  
     return false;
-}
-
-static void mask_info(char* info, char c) 
-{
-    char* p = info;
-
-    while (*p++ != c) {
-    }
-    
-    size_t len = p - info - 1;
-    p = info;
-
-    if (len == 1) {
-        *p = '*';
-
-        return;
-    } else if (len == 2) {
-        *++p = '*';
-        
-        return;
-    }
-
-    p = info + 1;
-    size_t i = 0;
-
-    while (i++ < len - 2) {
-        *p++ = '*';        
-    }          
 }
